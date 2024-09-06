@@ -50,17 +50,13 @@ const registerUser = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.files?.avatar[0]?.path;
   const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
-  if (!avatarLocalPath || !coverImageLocalPath) {
+  if (!avatarLocalPath && !coverImageLocalPath) {
     throw new ApiError(400, "Please upload avatar and cover image");
   }
 
   // handle to uploadagent
   const avatar = await uploadfile(avatarLocalPath);
   const coverImage = await uploadfile(coverImageLocalPath);
-
-  if (!avatarLocalPath || !coverImageLocalPath) {
-    throw new ApiError(400, "Please upload avatar and cover image");
-  }
 
   // create user object
   const user = await User.create({
@@ -251,7 +247,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 const updateProfile = asyncHandler(async (req, res) => {
   const { fullName, email } = req.body;
 
-  if (!fullName || !email) {
+  if (!fullName && !email) {
     throw new ApiError(400, "Full name and email are required");
   }
 
