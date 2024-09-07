@@ -4,7 +4,7 @@ import {User} from "../models/user.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
-import { uploadfile } from "../utils/fileUpload.js";
+import { uploadfile,deleteFromCloudinary } from "../utils/fileUpload.js";
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -126,7 +126,7 @@ const getVideoById = asyncHandler(async (req, res) => {
         return res
             .status( 200 )
             .json( 
-                new ApiResponse( 200, video, "Video found " ) 
+                new ApiResponse( 200, video, "Video found" ) 
             )
 
     } catch (error) {
@@ -140,17 +140,181 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "videoId is not correct to update video")
+    }
 
+    const videofile = video.videoFile
+    if (!videofile) {
+        throw new ApiError(404, "video url not found")
+    }
+
+    const video = await Video.findById(videoId)
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+    
+    if (req.user?._id === video?.owner) {
+        try {
+            const { title, description } = req.body
+            if ( 
+                [ title, description ].some( ( feild ) => feild.trim() === "" ) 
+            ) { 
+                throw new ApiError( 400, "Please provide title, description, thumbnail" ) 
+            }
+            
+            // delete old video
+            const oldVideoUrl = video.videoFile
+            const deleteOldVideoUrl = await deleteFromCloudinary( oldVideoUrl )
+            if ( !deleteOldVideoUrl ) { 
+                throw new ApiError( 400, "video not deleted" ) 
+            }
+
+            // delete old thumbnail
+            const thumbnailOldUrl = video.thumbnail
+            const deleteThumbnailOldUrl = await deleteFromCloudinary( thumbnailOldUrl )
+            if ( !deleteThumbnailOldUrl ) { 
+                throw new ApiError( 400, "thumbnail not deleted" ) 
+            }
+
+            const thumbnailLocalPath = req.file?.path
+            if ( !thumbnailLocalPath ) { 
+                throw new ApiError( 400, "thumbnail not found" ) 
+            }
+
+            const newThumbnail = await uploadfile(thumbnailLocalPath)
+
+            // upload and update new
+            const videoLocalPath = req.file?.path
+
+            if (!videoLocalPath) {
+                throw new ApiError(400, "video file is required please choose the file to update")
+            }
+
+            const newVideo = await uploadfile(videoLocalPath)
+
+            if (!newVideo.url) {
+                throw new ApiError(400, "Error while uploading on cloudinary")
+            }
+
+            const updatedVideo = await Video.findByIdAndUpdate(videoId,
+                {
+                    $set: {
+                        videoFile: newVideo.url,
+                        duration: newVideo.duration,
+                        title,
+                        description,
+                        thumbnail: newThumbnail.url,
+                    }
+                },
+                {
+                    new: true
+                }
+            )
+
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(200, updatedVideo, "Video Updated Sucessfully !")
+                )
+        } catch (error) {
+            throw new ApiError(400, "error while deleting video file from cloudinary to update video file")
+        }
+    } else {
+        throw new ApiError(400, "User is not authorised")
+    }
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: delete video
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "videoId is not correct to delete video")
+    }
+
+    const video = await Video.findById(videoId)
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    if (req.user?._id=== video?.owner) {
+        const videofile = video.videoFile
+    
+        if (videofile) {
+            try {
+                const oldVideoUrl = video.videoFile
+                const deleteOldVideoUrl = await deleteFromCloudinary( oldVideoUrl )
+                if ( !deleteOldVideoUrl ) { 
+                    throw new ApiError( 400, "video not deleted" ) 
+                }
+
+                // delete old thumbnail
+                const thumbnailOldUrl = video.thumbnail
+                const deleteThumbnailOldUrl = await deleteFromCloudinary( thumbnailOldUrl )
+                if ( !deleteThumbnailOldUrl ) { 
+                    throw new ApiError( 400, "thumbnail not deleted" ) 
+                }
+
+                await Video.findByIdAndDelete(video._id, (err) => {
+                    if (err) {
+                      console.log("Founded an Error in deleting a video : ", +err);
+                      throw new ApiError(400, "Video Not Deleted Successfully");
+                    }
+                })
+            } catch (error) {
+                throw new ApiError(400, "error while deleting video file from cloudinary")
+            }
+        } else {
+            throw new ApiError(404, "Video file not found")
+        }
+    
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(200, [], "Video is deleted successfully !")
+            )
+    }
+    //TODO: to delete comments and likes 
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+
+    if(!videoId || !isValidObjectId(videoId)) {
+        throw new ApiError(400, "Video id is not valid");
+    }
+
+    const video = await VideofindOne( 
+        {
+            _id: videoId,     
+            Owner: req.user._id, 
+        },
+    )
+    if(!video) {
+        throw new ApiError(404, "Unauthorised user!");
+    }
+
+    
+    const publishedStatus = video.isPublished
+    
+    const toggleStatus = await Video.findByIdAndUpdate(
+        videoId,
+        {
+            $set: {
+                isPublished: !publishedStatus,
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(
+            200,
+            toggleStatus,
+            "Status is updated successfully"
+        ))
 })
 
 export {
