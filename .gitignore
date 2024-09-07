@@ -1,0 +1,5 @@
+.env
+node_modules/
+src/controllers/todo.txt
+public/temp/*
+!public/temp/.gitkeep
