@@ -10,31 +10,39 @@ import { uploadfile,deleteFromCloudinary } from "../utils/fileUpload.js";
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query = "", sortBy = "createdAt", sortType = 1, userId = "" } = req.query
 
-    // if(!query || !query.trim() === "") {
-    //     throw new ApiError(400, "Query is required");
-    // }
+    let matchCondition = { $and: [] };
+
+    // Add query condition only if query is provided
+    if (query.trim()) {
+        matchCondition.$and.push({
+            $or: [
+                { title: { $regex: query, $options: "i" } },   
+                { description: { $regex: query, $options: "i" } }
+            ]
+        });
+    }
+
+    // Add userId condition if provided
+    if (userId) {
+        matchCondition.$and.push({ Owner: new mongoose.Types.ObjectId(userId) });
+    }
+
+    // If matchCondition.$and is empty, match all documents
+    if (matchCondition.$and.length === 0) {
+        matchCondition = {}; // This will match all videos
+    }
 
     let pipeline = [
         {
-            $match: {
-                $and: [
-                    {
-                        $or: [
-                            { title: { $regex: query, $options: "i" } },   
-                            { description: { $regex: query, $options: "i" } }
-                        ]
-                    },
-                    ...( userId ? [ { Owner: new mongoose.Types.ObjectId( userId ) } ] : "" )  
-                ]
-            }
+            $match: matchCondition
         },
-        {   
+        {
             $lookup: {
                 from: "users",
                 localField: "Owner",
                 foreignField: "_id",
                 as: "Owner",
-                pipeline: [   
+                pipeline: [
                     {
                         $project: {
                             _id: 1,
@@ -46,15 +54,13 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 ]
             }
         },
-        { 
+        {
             $addFields: {
-                Owner: {
-                    $first: "$Owner",
-                },
-            },
+                Owner: { $first: "$Owner" },
+            }
         },
         {
-            $sort: { [ sortBy ]: sortType }
+            $sort: { [sortBy]: sortType }
         }
     ];
 
@@ -102,7 +108,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
             })
         ) {
             throw new ApiError(400, "All fields are required");
-        }
+        }        
     
         // get thumbnail and video
         const thumbnailLocalPath = req.files?.thumbnail[0]?.path;
@@ -146,7 +152,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         return res
             .status( 501 )
             .json( 
-                new ApiError( 501, {}, "Problem in uploading video" ) 
+                new ApiError( 501, error, "Problem in uploading video" ) 
             )
     }
 })
