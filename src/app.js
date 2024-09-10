@@ -29,11 +29,13 @@ import userRouter from "./routes/user.route.js";
 import videoRouter from "./routes/video.route.js";
 import healthcheckRouter from "./routes/healthcheck.route.js";
 import commentRouter from "./routes/comment.route.js";
+import tweetRouter from "./routes/tweet.route.js"
 
 // Apply routes
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
 app.use("/healthcheck", healthcheckRouter);
 app.use("/comments", commentRouter);
+app.use("/tweets", tweetRouter);
 
 export { app };
