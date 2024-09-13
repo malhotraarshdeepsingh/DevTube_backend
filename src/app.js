@@ -31,6 +31,9 @@ import healthcheckRouter from "./routes/healthcheck.route.js";
 import commentRouter from "./routes/comment.route.js";
 import tweetRouter from "./routes/tweet.route.js";
 import playlistRouter from "./routes/playlist.route.js";
+import likeRouter from "./routes/like.route.js";
+import dashboardRouter from "./routes/dashboard.route.js";
+import subscriptionRouter from "./routes/subscription.route.js";
 
 // Apply routes
 app.use("/users", userRouter);
@@ -39,5 +42,8 @@ app.use("/healthcheck", healthcheckRouter);
 app.use("/comments", commentRouter);
 app.use("/tweets", tweetRouter);
 app.use("/playlists", playlistRouter);
+app.use("/likes", likeRouter);
+app.use("/dashboard", dashboardRouter);
+app.use("/subscription", subscriptionRouter);
 
 export { app };
