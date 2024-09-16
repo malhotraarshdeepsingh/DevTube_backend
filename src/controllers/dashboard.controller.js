@@ -10,14 +10,17 @@ import { Like } from "../models/like.model.js";
 import { User } from "../models/user.model.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {
+  // get info from params
   let { channel } = req.params;
 
+  // validate the channel id
   channel = await User.findOne({ username: channel });
   const channelID = new mongoose.Types.ObjectId(channel?._id);
   if ( !channel || !isValidObjectId(channelID) ) {
     throw new ApiError(400, "channel not found");
   }
 
+  // calculate total views and videos of videos by this channel
   const totalViewsAndVideos = await Video.aggregate([
     {
       $match: {
@@ -36,6 +39,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     },
   ]);
 
+  // calculate total subscribers, tweets, comments, and video likes by this channel
   const totalSubs = await Subscription.aggregate([
     { $match: 
         { channel: new mongoose.Types.ObjectId(channelID) } 
@@ -93,6 +97,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     { $count: "totalTweetLikes" },
   ]);
 
+  // send all the information
   return res.status(200).json(
     new ApiResponse(
       200,
@@ -112,13 +117,16 @@ const getChannelStats = asyncHandler(async (req, res) => {
 });
 
 const getChannelVideos = asyncHandler(async (req, res) => {
+  // get info from params and query 
   const { channel } = req.params;
   const { page = 1, limit = 10 } = req.query;
 
+  // check if channel id is valid
   if (!isValidObjectId(channel)) {
     throw new ApiError(400, "channel not found");
   }
 
+  // fetch all the videos related to the channel
   let pipeline = [
     {
       $match: {
@@ -162,12 +170,15 @@ const getChannelVideos = asyncHandler(async (req, res) => {
     },
   };
 
+  // Create pagination
   const videos = await Video.aggregatePaginate(pipeline, options);
 
+  // Check if there are no videos found for the channel  and throw an error if true  else return the videos
   if (videos?.total_videos === 0) {
     throw new ApiError(400, "Videos Not Found");
   }
-
+  
+  // Return the paginated videos
   return res
         .status(200)
         .json(new ApiResponse(200, { videos }, "Videos Found"));

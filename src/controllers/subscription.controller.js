@@ -1,29 +1,32 @@
 import { isValidObjectId } from "mongoose";
 import { Subscription } from "../models/subscription.model.js";
-import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { mongoose } from "mongoose";
 
 const toggleSubscription = asyncHandler(async (req, res) => {
+  // Validate the channelId parameter is a valid ObjectId
   const { channelId } = req.params;
-
   if (!isValidObjectId(channelId)) {
     throw new ApiError(400, "Channel Id is not available !");
   }
 
+  // check if the user is authenticated
   if (!req.user?._id) {
     throw new ApiError(400, "Invalid LoggedIn user Id  !");
   }
 
+  // Fetch the user's subscriptions and check if the channel is already subscribed
   const subscriberId = req.user?._id;
 
+  // Check if the user is already subscribed to the channel
   const isSubscribed = await Subscription.findOne({
     channel: channelId,
     subscriber: subscriberId,
   });
 
+  // Toggle the subscription status and update the user's subscriptions array accordingly
   let subscriptionStatus;
   try {
     if (isSubscribed) {
@@ -52,12 +55,15 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 });
 
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
+  // get information from params
   const { channelId } = req.params;
 
+  // check if channel id is valid
   if (!isValidObjectId(channelId)) {
     throw new ApiError(401, "Invalid Channel ID!");
   }
 
+  // fetch total subscribers for the given channel
   const userSubscribers = await Subscription.aggregate([
     {
       $match: {
@@ -92,12 +98,15 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 });
 
 const getSubscribedChannels = asyncHandler(async (req, res) => {
+  // get info from params
   const { subscriberId } = req.params;
 
+  // validate subscription id 
   if (!isValidObjectId(subscriberId)) {
     throw new ApiError(401, "Invalid subscriber Id!");
   }
 
+  // fetch subscribed channels for the given subscriber
   const userchannel = await Subscription.aggregate([
     {
       $match: {
@@ -132,6 +141,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
     },
   ]);
 
+  // return a array with map function of all subscribers
   const channelsList = userchannel.map((i) => i.subscribedTo);
 
   return res

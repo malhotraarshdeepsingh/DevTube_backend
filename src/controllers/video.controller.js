@@ -343,6 +343,9 @@ const deleteVideo = asyncHandler(async (req, res) => {
                 }
 
                 await Video.findByIdAndDelete(video._id)
+                await Like.deleteMany({video: video._id})
+                await Comment.deleteMany({video: video._id})
+
             } catch (error) {
                 throw new ApiError(400, error, "error while deleting video file from cloudinary")
             }
@@ -356,7 +359,6 @@ const deleteVideo = asyncHandler(async (req, res) => {
                 new ApiResponse(200, [], "Video is deleted successfully !")
             )
     }
-    //TODO: to delete comments and likes 
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {

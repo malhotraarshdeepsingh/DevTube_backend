@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 
 
 const healthcheck = asyncHandler(async(req, res) => {
+    // on call, returns a message 
     return res
         .status(200)
         .json(
