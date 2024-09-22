@@ -52,13 +52,17 @@ const uploadfile = async (localFilePath) => {
 };
 
 // Delete from cloudnary
-const deleteFromCloudinary = async(cloudinaryFilePath) => {
+const deleteFromCloudinary = async(cloudinaryFilePath, resource_type) => {
   try {
     if (!cloudinaryFilePath) return null
 
     const publicId = cloudinaryFilePath.split("/").pop().split(".")[0];
 
-    const response = await fileagent.uploader.destroy(publicId)
+    const response = await fileagent.uploader.destroy(publicId,{
+      resource_type: resource_type
+    })
+
+    console.log(response)
 
     if (response.result !== "ok") {
       console.error("Cloudinary deletion failed:", response);

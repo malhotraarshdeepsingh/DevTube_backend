@@ -5,6 +5,8 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { uploadfile,deleteFromCloudinary } from "../utils/fileUpload.js";
+import { Like } from "../models/like.model.js"
+import { Comment } from "../models/comment.model.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -254,14 +256,14 @@ const updateVideo = asyncHandler(async (req, res) => {
             
             // delete old video
             const oldVideoUrl = video.videoFile
-            const deleteOldVideoUrl = await deleteFromCloudinary( oldVideoUrl )
+            const deleteOldVideoUrl = await deleteFromCloudinary( oldVideoUrl, "video" )
             if ( !deleteOldVideoUrl ) { 
                 throw new ApiError( 400, "video not deleted" ) 
             }
 
             // delete old thumbnail
             const thumbnailOldUrl = video.thumbnail
-            const deleteThumbnailOldUrl = await deleteFromCloudinary( thumbnailOldUrl )
+            const deleteThumbnailOldUrl = await deleteFromCloudinary( thumbnailOldUrl, "image" )
             if ( !deleteThumbnailOldUrl ) { 
                 throw new ApiError( 400, "thumbnail not deleted" ) 
             }
@@ -330,14 +332,14 @@ const deleteVideo = asyncHandler(async (req, res) => {
         if (videofile) {
             try {
                 const oldVideoUrl = video.videoFile
-                const deleteOldVideoUrl = await deleteFromCloudinary( oldVideoUrl )
+                const deleteOldVideoUrl = await deleteFromCloudinary( oldVideoUrl, "video" )
                 if ( !deleteOldVideoUrl ) { 
                     throw new ApiError( 400, "video not deleted" ) 
                 }
 
                 // delete old thumbnail
                 const thumbnailOldUrl = video.thumbnail
-                const deleteThumbnailOldUrl = await deleteFromCloudinary( thumbnailOldUrl )
+                const deleteThumbnailOldUrl = await deleteFromCloudinary( thumbnailOldUrl, "image" )
                 if ( !deleteThumbnailOldUrl ) { 
                     throw new ApiError( 400, "thumbnail not deleted" ) 
                 }

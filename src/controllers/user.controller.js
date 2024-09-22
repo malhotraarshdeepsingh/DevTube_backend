@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import { uploadfile } from "../utils/fileUpload.js";
+import { uploadfile, deleteFromCloudinary } from "../utils/fileUpload.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import { Mongoose } from "mongoose";
@@ -274,6 +274,12 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please upload avatar");
   }
 
+  const deleteOldAvatar = await deleteFromCloudinary( req.user?.avatar, "image" )
+  if(!deleteOldAvatar){
+    console.log("error while deleting avatar while updating")
+    throw new ApiError(500, "Failed to delete old avatar")
+  }
+
   const avatar = await uploadfile(avatarLocalPath);
 
   if (!avatar.url) {
@@ -290,6 +296,11 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     { new: true }
   ).select("-password");
 
+  if(!user){
+    console.log("error while db request user update avatar",error)
+    return ApiError(500, "Failed to update avatar")
+  }
+
   return res
     .status(200)
     .json(new ApiResponse(200, user, "Avatar updated successfully"));
@@ -300,6 +311,12 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
   if (!coverImageLocalPath) {
     throw new ApiError(400, "Please upload avatar");
+  }
+
+  const deleteOldCoverImage = await deleteFromCloudinary( req.user?.coverImage, "image" )
+  if(!deleteOldCoverImage){
+    console.log("error while deleting cover image while updating")
+    throw new ApiError(500, "Failed to delete old cover image")
   }
 
   const coverImage = await uploadfile(coverImageLocalPath);
@@ -317,6 +334,11 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     },
     { new: true }
   ).select("-password");
+
+  if(!user){
+    console.log("error while db request user update avatar",error)
+    return ApiError(500, "Failed to update avatar")
+  }
 
   return res
     .status(200)
