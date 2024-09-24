@@ -70,6 +70,132 @@ To run this project, you will need to add the following environment variables to
 `CLOUDINARY_API_KEY =`
 
 `CLOUDINARY_API_SECRET =`
+
+
+## API Reference
+
+#### User Registration
+
+```http
+  POST /users/register
+```
+
+| Body | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `fullName` | `string` | **Required** |
+| `email` | `string` | **Required** |
+| `username` | `string` | **Required** |
+| `password` | `string` | **Required** |
+
+| Files | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `coverImage` | `Image` | **Required** |
+| `avatar` | `Image` | **Required** |
+
+#### User Login
+
+```http
+  POST /users/login
+```
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `username or email`      | `string` | **Required** |
+| `password`      | `string` | **Required** |
+
+#### User Logout
+
+```http
+  POST /users/logout
+```
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### User Refresh Token
+
+```http
+  POST /users/refresh-token
+```
+
+| Cookies / Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### User Change Password
+
+```http
+  POST /users/change-password
+```
+| Cookies / Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `oldPassword`      | `string` | **Required** |
+| `newPassword`      | `string` | **Required** |
+
+#### User Current User
+
+```http
+  GET /users/current-user
+```
+
+| Cookies / Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### User Update Profile
+
+```http
+  PATCH /users/update-account
+```
+| Cookies / Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `email`      | `string` | **Required** |
+| `fullName`      | `string` | **Required** |
+
+#### User Update Cover Image
+
+```http
+  PATCH /users/update-cover-image
+```
+| Cookies / Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+| File | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `coverImage`      | `Image` | **Required** |
+
+#### User Update Avatar
+
+```http
+  PATCH /users/update-avatar
+```
+| Cookies / Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+| File | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `avatar`      | `Image` | **Required** |
+
+#### Get Channel Profile
+
+```http
+  GET /users/channels/${username}
+```
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `username`      | `Object Id` | **Required** |
+
 ## Contributing
 
 Contributions are always welcome!
