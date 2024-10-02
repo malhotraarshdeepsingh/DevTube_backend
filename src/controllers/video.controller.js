@@ -12,7 +12,11 @@ import { Comment } from "../models/comment.model.js"
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query = "", sortBy = "createdAt", sortType = 1, userId = "" } = req.query
 
-    let matchCondition = { $and: [] };
+    let matchCondition = { $and: [
+        {
+            isPublished: true
+        }
+    ] };
 
     // Add query condition only if query is provided
     if (query.trim()) {
@@ -27,11 +31,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
     // Add userId condition if provided
     if (userId) {
         matchCondition.$and.push({ Owner: new mongoose.Types.ObjectId(userId) });
-    }
-
-    // If matchCondition.$and is empty, match all documents
-    if (matchCondition.$and.length === 0) {
-        matchCondition = {}; // This will match all videos
     }
 
     let pipeline = [
@@ -159,22 +158,17 @@ const publishAVideo = asyncHandler(async (req, res) => {
     }
 })
 
-const getVideoById = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    // 1. Get the video id from the request params(frontend)  [http://localhost:8000/video/get-video/:videoId]
-    // 2. Check if the videoId id is valid
-    // 3. Find the video in the database
-    
+const getVideoById = asyncHandler(async (req, res) => {    
     try {
-        // 1. Get the video id from the request params(frontend)  [http://localhost:8000/video/get-video/:videoId]
+        // Get the video id from the request params(frontend)  [http://localhost:8000/video/get-video/:videoId]
         const { videoId } = req.params
 
-        // 2. Check if the videoId id is valid
+        // Check if the videoId id is valid
         if ( !isValidObjectId( videoId ) ) { 
             throw new ApiError( 400, "Invalid VideoID" )
         }
 
-        // 3. Find the video in the database
+        // Find the video in the database
         const video = await Video.findById( videoId )
 
         if ( !video || (
@@ -183,7 +177,7 @@ const getVideoById = asyncHandler(async (req, res) => {
             throw new ApiError( 400, "No such video exists" ) 
         }
 
-        // 4. Increment views of video
+        // Increment views of video
         const user = await User.findById(req.user?._id)
 
         if (!(user.watchHistory.includes(videoId))) {
@@ -199,7 +193,7 @@ const getVideoById = asyncHandler(async (req, res) => {
             )
         }
 
-        // 5. Set video_id in watchHistory of user
+        // Set video_id in watchHistory of user
         await User.findByIdAndUpdate(req.user?._id,
             {
                 $addToSet: {

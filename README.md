@@ -71,10 +71,11 @@ To run this project, you will need to add the following environment variables to
 
 `CLOUDINARY_API_SECRET =`
 
-
 ## API Reference
 
-#### User Registration
+### User Routes
+
+#### Registration
 
 ```http
   POST /users/register
@@ -92,7 +93,7 @@ To run this project, you will need to add the following environment variables to
 | `coverImage` | `Image` | **Required** |
 | `avatar` | `Image` | **Required** |
 
-#### User Login
+#### Login
 
 ```http
   POST /users/login
@@ -103,7 +104,7 @@ To run this project, you will need to add the following environment variables to
 | `username or email`      | `string` | **Required** |
 | `password`      | `string` | **Required** |
 
-#### User Logout
+#### Logout
 
 ```http
   POST /users/logout
@@ -113,7 +114,7 @@ To run this project, you will need to add the following environment variables to
 | :-------- | :------- | :-------------------------------- |
 | `Jwt-Token`      | `string` | **Required** |
 
-#### User Refresh Token
+#### Refresh Token
 
 ```http
   POST /users/refresh-token
@@ -123,7 +124,7 @@ To run this project, you will need to add the following environment variables to
 | :-------- | :------- | :-------------------------------- |
 | `Jwt-Token`      | `string` | **Required** |
 
-#### User Change Password
+#### Change Password
 
 ```http
   POST /users/change-password
@@ -137,7 +138,7 @@ To run this project, you will need to add the following environment variables to
 | `oldPassword`      | `string` | **Required** |
 | `newPassword`      | `string` | **Required** |
 
-#### User Current User
+#### Current User
 
 ```http
   GET /users/current-user
@@ -147,7 +148,7 @@ To run this project, you will need to add the following environment variables to
 | :-------- | :------- | :-------------------------------- |
 | `Jwt-Token`      | `string` | **Required** |
 
-#### User Update Profile
+#### Update Profile
 
 ```http
   PATCH /users/update-account
@@ -161,7 +162,7 @@ To run this project, you will need to add the following environment variables to
 | `email`      | `string` | **Required** |
 | `fullName`      | `string` | **Required** |
 
-#### User Update Cover Image
+#### Update Cover Image
 
 ```http
   PATCH /users/update-cover-image
@@ -174,7 +175,7 @@ To run this project, you will need to add the following environment variables to
 | :-------- | :------- | :-------------------------------- |
 | `coverImage`      | `Image` | **Required** |
 
-#### User Update Avatar
+#### Update Avatar
 
 ```http
   PATCH /users/update-avatar
@@ -195,6 +196,284 @@ To run this project, you will need to add the following environment variables to
 | Params | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
 | `username`      | `Object Id` | **Required** |
+
+### Video Routes
+
+#### Get All Videos 
+
+```http
+  GET /videos
+```
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `query`      | `string` | Optional |
+| `userId`      | `string` | Optional |
+
+Returns with all the videos which matches the query and userId if provided else will return all the videos stored in the db ({with isPublised:true})
+
+#### Publish Video 
+
+```http
+  POST /videos
+```
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `title`      | `string` | **Required** |
+| `description`      | `string` | **Required** |
+| `isPublished`      | `boolean` | **Required** |
+
+| Files | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `thumbnail` | `Image` | **Required** |
+| `coverImage` | `Image` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Get Video by ID
+
+```http
+  GET /videos/:videoId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `VideoId`      | `Object Id` | **Required** |
+
+#### Update Video 
+
+```http
+  PATCH /videos/:videoId
+```
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `title`      | `string` | **Required** |
+| `description`      | `string` | **Required** |
+| `isPublished`      | `boolean` | **Required** |
+
+| Files | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `thumbnail` | `Image` | **Required** |
+| `coverImage` | `Image` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `VideoId`      | `Object Id` | **Required** |
+
+#### Delete Video 
+
+```http
+  Delete /videos/:videoId
+```
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `VideoId`      | `Object Id` | **Required** |
+
+#### Toggle Publish Video-Status
+
+```http
+  PATCH /videos/toggle/publish/:VideoId
+```
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `VideoId`      | `Object Id` | **Required** |
+
+### HealthCheck
+
+```http
+  GET /healthcheck
+```
+Returns a 200 success message on call
+
+### Comment Routes
+
+#### Get Video Comments
+
+```http
+  GET /comments/:videoId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `VideoId`      | `Object Id` | **Required** |
+
+#### Add Comment
+
+```http
+  POST /comments/:videoId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `VideoId`      | `Object Id` | **Required** |
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `content`      | `string` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Update Comment
+
+```http
+  PATCH /comments/c/:commentId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `commentId`      | `Object Id` | **Required** |
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `content`      | `string` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Delete Comment
+
+```http
+  DELETE /comments/c/:commentId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `commentId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+### Tweet Routes
+
+#### Create Tweet
+
+```http
+  POST /tweets
+```
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `content`      | `string` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Get User Tweets
+
+```http
+  GET /tweets/user/:userId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `userId`      | `Object Id` | **Required** |
+
+#### Update Tweet
+
+```http
+  PATCH /tweets/tweetId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `TweetId`      | `Object Id` | **Required** |
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `content`      | `string` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Delete Tweet
+
+```http
+  DELETE /tweet/:tweetId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `tweetId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+### Like Routes 
+
+#### Toggle Video Like
+
+```http
+  POST /likes/v/:videoId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `videoId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Toggle Comment Like
+
+```http
+  POST /likes/c/:commentId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `commentId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Toggle Tweet Like
+
+```http
+  POST /likes/t/:tweetId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `tweetId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Get Liked Videos
+
+```http
+  POST /likes/videos
+```
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
 
 ## Contributing
 
