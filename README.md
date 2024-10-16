@@ -71,6 +71,7 @@ To run this project, you will need to add the following environment variables to
 
 `CLOUDINARY_API_SECRET =`
 
+
 ## API Reference
 
 ### User Routes
@@ -470,6 +471,166 @@ Returns a 200 success message on call
 ```http
   POST /likes/videos
 ```
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+### Dashboard Routes
+
+#### Get Channel Stats
+
+```http
+  GET /dashboard/stats/:channel
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `channel`      | `Object Id` | **Required** |
+
+#### Get Channel Videos
+
+```http
+  GET /dashboard/videos/:channel
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `channel`      | `Object Id` | **Required** |
+
+### Subscription Routes
+
+#### Get Channel Subscribers
+
+```http
+  GET /subscription/c/:channelId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `channelId`      | `Object Id` | **Required** |
+
+####  Toggle Subscription Status
+
+```http
+  POST /subscription/c/:channelId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `channelId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Get Subscribed Channels
+
+```http
+  GET /subscription/u/:subscriberId
+```
+
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `subscriberId`      | `Object Id` | **Required** |
+
+### Playlist Routes
+
+#### Create A Playlist 
+
+```http
+  POST /playlist/
+```
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `name`      | `string` | **Required** |
+| `description`      | `string` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Get A Playlist 
+
+```http
+  GET /playlist/:playlistId
+```
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `playlistId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Update A Playlist 
+
+```http
+  PATCH /playlist/:playlistId
+```
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `playlistId`      | `Object Id` | **Required** |
+
+| Body | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `name`      | `string` | **Required** |
+| `description`      | `string` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Delete A Playlist 
+
+```http
+  Delete /playlist/:playlistId
+```
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `playlistId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Add Video To Playlist 
+
+```http
+  PATCH /playlist/add/:videoId/:playlistId
+```
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `playlistId`      | `Object Id` | **Required** |
+| `videoId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Remove Video From Playlist 
+
+```http
+  PATCH /playlist/remove/:videoId/:playlistId
+```
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `playlistId`      | `Object Id` | **Required** |
+| `videoId`      | `Object Id` | **Required** |
+
+| Cookies | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `Jwt-Token`      | `string` | **Required** |
+
+#### Get User Playlists 
+
+```http
+  GET /playlist/user/:userId
+```
+| Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `userId`      | `Object Id` | **Required** |
 
 | Cookies | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
